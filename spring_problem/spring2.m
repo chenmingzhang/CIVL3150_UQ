@@ -1,14 +1,16 @@
 %% This is a script to solve mass damping problem described at
-%   Q5 Tutorial 1, CIVL3150. This script serves an example 
-%   to solve ordinary differential equation using MATLAB
+%   Q5 Tutorial 1, CIVL3150. This script serves an example to solve ordinary
+%   differential equation using MATLAB
 %  Some good habits to follow when developing your MATLAB script:
-%  1. write scripts in three sections: (a) initialization
-%    (b) main calculation loop and (c) result analysis
-%  2. Declare the meaning and unit of the variable as
-%    comment next to it.
+%  1. write scripts in three sections: 
+%     (a) initialization 
+%     (b) main calculation loop and 
+%     (c) result analysis 
+%  2. Declare the meaning and unit of the variable as comment next to it.
 %
-%% ------- initialize simulation -----
-% clear all declared variables
+
+%% ------- initialize simulation ----- 
+%clear all declared variables
 clear
 
 % damper coefficient (kg/sec)
@@ -24,18 +26,18 @@ M = 5;
 %  Simulation result should always be independent from this parameter.
 %  one way to check the dependency is to run the simulation with
 %  different dt values and check the difference of the results
-dt = 0.1;
+% give it a try about dt=0.2 0.1 0.01 0.001.
+dt = 0.01;
 
 % duration of simulation  (s)
-tsim = 200;
+tsim = 100;
 
 % number of time steps estimated
-nt = tsim/dt+1;
+nt = tsim/dt;
 
-% t_ftd is x-axis (i.e., time) of the key points in the force-time 
-%   diagram (s). notice that the last x-axis is the duration of 
-%   simulation
-t_ftd = [0,10,15,tsim];
+% t_ftd is x-axis (i.e., time) of the key points in the force-time
+% diagram (s). notice that the last x-axis is the duration of simulation
+t_ftd = [0,10,15,tsim+dt];
 
 % F_ftd is y-axis (i.e., force) of the key points in the force-time 
 %   diagram (N or kgms-2). notice that the last y-axis is the force
@@ -50,6 +52,7 @@ t = zeros(nt,1);
 x = zeros(nt,1);
 p = zeros(nt,1);
 F = zeros(nt,1);
+
 % an array for velocity (m/s), the inital value is 0
 % note that the v array here is a converter, not a stock
 % more information:
@@ -92,23 +95,23 @@ for i = 2:nt
     % cut the diagram into segments which can be represented by a line
     % function. for example, the line made by point (10,5) and (15,0) is the 
     % second segment. 
-    % This segment can be expressed by force= ( 5-0)/(15-10) * (time-15) +0
+    % This segment can be expressed by Force= ( 5-0)/(15-10) * (time-15) +0
     % The forward time index (F_fIdx) and backward time index (F_bIdx) for 
     % any time between 10 and 15s are 2 and 3. These indices are used to 
     % identify the segments that the current time locates
-    % the forward index of time
-    % think about how to use similar way to represent flow associated
+    % the forward index of time.
+    % think about how to use similar way to represent the inflow to the void
+    % associated
     % with rainfall in project 2, especially when the simulation needs to 
     % run up to the second year? (function mod would be useful)
-    F_fIdx = find((t_ftd-t(i))>0,1);
+
+    F_fIdx = find((t_ftd-t(i))>=0,1);
     % the backward index of time
     F_bIdx = F_fIdx-1;
     % the slope of the line segment
-    k_f    = (F_ftd(F_fIdx)-F_ftd(F_bIdx)) / (t_ftd(F_fIdx)-t_ftd(F_bIdx))  ;
+    k_f    = (F_ftd(F_fIdx)-F_ftd(F_bIdx)) / (t_ftd(F_fIdx)-t_ftd(F_bIdx));
     % the force of time step i-1
     F(i-1) = k_f*(t(i-1)-t_ftd(F_fIdx))+F_ftd(F_fIdx) ;
-
-
 
     % net flows associated with the momentum balance
     % as it is using EULER method, all the flow are based on 
@@ -143,7 +146,7 @@ xlabel('Time (s)','FontSize',fontsize,'FontWeight','bold')
 % put label in y axis
 ylabel('displacement (m)','FontSize',fontsize,'FontWeight','bold')
 % give a title to the plot
-title('Displacement of mass over time');
+title(  sprintf(  'Displacement of mass over time, dt= %e',dt));
 
 
 subplot(3,1,2)
@@ -154,14 +157,15 @@ title('Momentum of mass over time');
 
 
 subplot(3,1,3)
-plot(t,v,'r-o','linewidth',linewidth)
+plot(t,F,'r-o','linewidth',linewidth)
 xlabel('Time (s)','FontSize',fontsize,'FontWeight','bold')
 ylabel('Velocity (m/s)','FontSize',fontsize,'FontWeight','bold')
 title('Velocity of mass over time');
 
 print(a.fig,'mass.png','-dpng')   % png figure output
 print(a.fig,'mass.tif','-dtiff','-r70')   % tif figure output
-print(a.fig,'mass.eps','-depsc')  % vectorized figure output (publishing standard)
+print(a.fig,'mass.eps','-depsc')  % vectorized figure output 
+                               %   (publishing standard)
                                % it can be viewed using ghostscript, evince
 			       % or by insterting it into word
 saveas(a.fig,'mass.fig','fig') % save the matlab figure
