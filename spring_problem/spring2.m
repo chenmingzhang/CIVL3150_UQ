@@ -157,7 +157,7 @@ title('Momentum of mass over time');
 
 
 subplot(3,1,3)
-plot(t,F,'r-o','linewidth',linewidth)
+plot(t,v,'r-o','linewidth',linewidth)
 xlabel('Time (s)','FontSize',fontsize,'FontWeight','bold')
 ylabel('Velocity (m/s)','FontSize',fontsize,'FontWeight','bold')
 title('Velocity of mass over time');
